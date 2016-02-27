@@ -1,13 +1,15 @@
 import pandas as pd
 from tqdm import tqdm, trange
 import tables
-
+from sklearn.linear_model import LinearRegression
+from sklearn import cross_validation
+import numpy as np
 
 class Featurizer:
     def __init__(self):
         self.assignments = set()
 
-    def featurize(self, in_filename, out_filename, chunksize=10 ** 6):
+    def featurize(self, in_filename, out_filename, chunksize=10 ** 8):
 
         self._learn_structure(in_filename, chunksize)
         dtype = {
@@ -32,6 +34,7 @@ class Featurizer:
                 arr.append(features.as_matrix())
                 i += 1
             out.close()
+
 
     def _learn_structure(self, filename, chunksize=10 ** 6):
         self.assignments = set()
@@ -86,3 +89,20 @@ class Featurizer:
 
     def _featurize_number_of_calls(self, df, features):
         features['n_calls'] = df.CSPL_RECEIVED_CALLS
+
+    def linear_regression(self, in_filename):
+    	features = None
+    	with tables.open_file(in_filename) as h5_file:
+            features = h5_file.root.features
+
+	    X = features[:, :-1]
+	    y = features[:, -1]
+	    clf = LinearRegression()
+	    scores = cross_validation.cross_val_score(clf, X,y, scoring='mean_squared_error', cv=5)
+
+	print(-scores)
+
+feat = Featurizer()
+feat.featurize('train_2011_2012.csv', 'featurized.h5')
+feat.linear_regression('featurized.h5')
+
