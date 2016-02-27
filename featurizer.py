@@ -4,12 +4,13 @@ import tables
 from sklearn.linear_model import LinearRegression
 from sklearn import cross_validation
 import numpy as np
+from sklearn.linear_model import SGDRegressor
 
 class Featurizer:
     def __init__(self):
         self.assignments = set()
 
-    def featurize(self, in_filename, out_filename, chunksize=10 ** 8):
+    def featurize(self, in_filename, out_filename, chunksize=10 ** 6):
 
         self._learn_structure(in_filename, chunksize)
         dtype = {
@@ -90,19 +91,27 @@ class Featurizer:
     def _featurize_number_of_calls(self, df, features):
         features['n_calls'] = df.CSPL_RECEIVED_CALLS
 
-    def linear_regression(self, in_filename):
-    	features = None
-    	with tables.open_file(in_filename) as h5_file:
-            features = h5_file.root.features
+    def linear_regression(self, in_filename, chunksize=10**6):
+    	h5_file = tables.open_file(in_filename)
+        samples = h5_file.root.features
 
-	    X = features[:, :-1]
-	    y = features[:, -1]
-	    clf = LinearRegression()
-	    scores = cross_validation.cross_val_score(clf, X,y, scoring='mean_squared_error', cv=5)
+        clf = SGDRegressor()
+        for i in range(0, samples.nrows, chunksize):
+        	X = samples[i:i+chunksize, :-1]
+        	y = samples[i:i+chunksize, -1]
+        	clf.partial_fit(X,y)
 
-	print(-scores)
+        X = samples[:-1,:-1]
+        y = samples[:-1, -1]
+        y_predicted = clf.predict(X)
+        y_predicted = [int(round(x)) if x > 0 else 0 for x in y_predicted]
+        diff = (y_predicted - y)**2
+        print (sum(diff))
+
+        h5_file.close()
+
+	# print(-scores)
 
 feat = Featurizer()
-feat.featurize('train_2011_2012.csv', 'featurized.h5')
-feat.linear_regression('featurized.h5')
-
+# feat.featurize('files/train_small.csv', 'files/featurized_small.h5')
+feat.linear_regression('files/featurized_france.h5')
