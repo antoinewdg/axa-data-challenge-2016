@@ -92,14 +92,14 @@ class Featurizer:
         features['n_calls'] = df.CSPL_RECEIVED_CALLS
 
     def linear_regression(self, in_filename, chunksize=10**6):
-    	h5_file = tables.open_file(in_filename)
+        h5_file = tables.open_file(in_filename)
         samples = h5_file.root.features
 
         clf = SGDRegressor()
         for i in range(0, samples.nrows, chunksize):
-        	X = samples[i:i+chunksize, :-1]
-        	y = samples[i:i+chunksize, -1]
-        	clf.partial_fit(X,y)
+            X = samples[i:i+chunksize, :-1]
+            y = samples[i:i+chunksize, -1]
+            clf.partial_fit(X,y)
 
         X = samples[:-1,:-1]
         y = samples[:-1, -1]
@@ -110,7 +110,7 @@ class Featurizer:
 
         h5_file.close()
 
-	# print(-scores)
+    # print(-scores)
 
 feat = Featurizer()
 # feat.featurize('files/train_small.csv', 'files/featurized_small.h5')
