@@ -22,7 +22,7 @@ dtype = {
         }
 
 cols = ['DATE', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-chunks = pd.read_csv("files/train_france.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=10**6)
+chunks = pd.read_csv("../data/train_2011_2012.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=10**6)
 
 df = pd.DataFrame()
 for chunk in chunks:
@@ -35,10 +35,9 @@ df['prediction'] = df['CSPL_RECEIVED_CALLS']
 
 num_rows = 12408
 
+df['DATE'] = pd.to_datetime(df['DATE'].astype(str))
+df = df[df['DATE'] > '2011-12-31'] 
 df = df.sample(n=num_rows)
 df = df.sort(['DATE'])
 
-df.to_csv('submission_test.txt', sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
-
-
-
+df.to_csv('../data/submission_test.txt', sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])

@@ -76,7 +76,7 @@ dtype = {
         }
 
 cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-chunks = pd.read_csv("files/train_france.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=10**6)
+chunks = pd.read_csv("../data/train_2011_2012.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=10**6)
 
 df = pd.DataFrame()
 for chunk in chunks:
@@ -94,7 +94,7 @@ df = df.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=Fa
 features = pd.DataFrame()
 featurize_day_of_the_week(df,features)
 featurize_time_slot(df, features)
-assignments = learn_structure("files/train_france.csv")
+assignments = learn_structure("../data/train_2011_2012.csv")
 featurize_assignment(df, features, assignments)
 featurize_number_of_calls(df, features)
 
@@ -114,8 +114,14 @@ dtype = {
         }
 
 cols = ['DATE', 'ASS_ASSIGNMENT', 'prediction']
-df2 = pd.read_csv("files/submission.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
+df2 = pd.read_csv("../data/submission_test.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
 
+#Get the answer vector
+y_true = np.asarray(df2['prediction'])
+
+
+
+#Featurize the submission file
 submission_features = pd.DataFrame()
 
 weekdays = pd.DatetimeIndex(df2['DATE']).weekday
@@ -161,7 +167,7 @@ for i in trange(1,len(X_test)):
 # In[59]:
 
 y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
-print(y_pred_round)
+#print(y_pred_round)
 
 
 # # Output
@@ -169,7 +175,15 @@ print(y_pred_round)
 # In[62]:
 
 df2.prediction = pd.Series(y_pred_round)
-df2.to_csv('submission_out.txt', sep='\t', index=False)
+df2.to_csv('../results/submission_out.txt', sep='\t', index=False)
+
+
+print('MSE round: '),
+print(mean_squared_error(y_true, y_pred_round))
+
+
+print('MSE not round: '),
+print(mean_squared_error(y_true, y_pred))
 
 
 # In[ ]:
