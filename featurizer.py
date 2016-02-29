@@ -1,117 +1,122 @@
 import pandas as pd
 from tqdm import tqdm, trange
 import tables
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn import cross_validation
 import numpy as np
-from sklearn.linear_model import SGDRegressor
-
-class Featurizer:
-    def __init__(self):
-        self.assignments = set()
-
-    def featurize(self, in_filename, out_filename, chunksize=10 ** 6):
-
-        self._learn_structure(in_filename, chunksize)
-        dtype = {
-            'DATE': object,
-            'WEEK_END': int,
-            'DAY_WE_DS': str,
-            'ASS_ASSIGNMENT': str,
-            'CSPL_RECEIVED_CALLS': int
-        }
-
-        cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-        chunks = pd.read_csv(in_filename, sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=chunksize)
-
-        with tables.open_file(out_filename, mode='w') as out:
-            atom = tables.Float64Atom()
-            i = 0
-            arr = None
-            for chunk in chunks:
-                features = self._featurize_chunk(chunk)
-                if i == 0:
-                    arr = out.create_earray(out.root, 'features', atom=atom, shape=(0, features.shape[1]))
-                arr.append(features.as_matrix())
-                i += 1
-            out.close()
+from sklearn.metrics import mean_squared_error
+from pandas.tseries.offsets import *
+import math
 
 
-    def _learn_structure(self, filename, chunksize=10 ** 6):
-        self.assignments = set()
+def learn_structure(filename, chunksize=10 ** 6):
+    assignments = set()
 
-        dtype = {'ASS_ASSIGNMENT': str}
-        cols = ['ASS_ASSIGNMENT']
-        chunks = pd.read_csv(filename, sep=";", usecols=cols, dtype=dtype, chunksize=chunksize)
+    dtype = {'ASS_ASSIGNMENT': str}
+    cols = ['ASS_ASSIGNMENT']
+    chunks = pd.read_csv(filename, sep=";", usecols=cols, dtype=dtype, chunksize=chunksize)
 
-        for df in tqdm(chunks):
-            self.assignments.update(df.ASS_ASSIGNMENT.unique())
+    for df in tqdm(chunks):
+        assignments.update(df.ASS_ASSIGNMENT.unique())
 
-        print(self.assignments)
+    print(assignments)
 
-    def _featurize_chunk(self, df):
-        features = pd.DataFrame()
-        self._featurize_day_of_the_week(df, features)
-        self._featurize_time_slot(df, features)
-        self._featurize_assignment(df, features)
-        self._featurize_number_of_calls(df, features)
+    return assignments
 
-        return features
 
-    def _featurize_day_of_the_week(self, df, features):
-        print("Featurizing days of the week")
+def load_training_set(filename):
+    dtype = {
+        'DATE': object,
+        'WEEK_END': int,
+        'DAY_WE_DS': str,
+        'ASS_ASSIGNMENT': str,
+        'CSPL_RECEIVED_CALLS': int
+    }
 
-        days = [('monday', 'Lundi'), ('tuesday', 'Mardi'), ('wednesday', 'Mercredi'), ('thursday', 'Jeudi'),
-                ('friday', 'Vendredi'), ('saturday', 'Samedi'), ('sunday', 'Dimanche')]
+    cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
+    chunks = pd.read_csv("files/train_france.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'],
+                         chunksize=10 ** 6)
 
-        features['is_week_end'] = df.WEEK_END
-        for i in trange(7):
-            en, fr = days[i]
-            features[en] = (df.DAY_WE_DS == fr).astype(int)
+    df = pd.DataFrame()
+    for chunk in chunks:
+        aux = chunk.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)[
+            'CSPL_RECEIVED_CALLS'].sum()
+        df = pd.concat([df, aux])
 
-        print()
+    df = df.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)[
+        'CSPL_RECEIVED_CALLS'].sum()
 
-    def _featurize_time_slot(self, df, features):
-        print("Featurizing time slots")
+    return df
 
-        for h in trange(24):
-            for s in range(2):
-                features['time_slot_' + str(2 * h + s)] = ((df.DATE.dt.hour == h) & (df.DATE.dt.minute == 30 * s)) \
-                    .astype(int)
 
-        print()
+def load_submission(filename):
+    dtype = {
+        'DATE': object,
+        'ASS_ASSIGNMENT': str,
+        'prediction': int
+    }
 
-    def _featurize_assignment(self, df, features):
-        print("Featurizing assignment")
-        i = 0
-        for assignment in self.assignments:
-            features['assignment_' + str(i)] = (df.ASS_ASSIGNMENT == assignment).astype(int)
-            i += 1
+    cols = ['DATE', 'ASS_ASSIGNMENT', 'prediction']
+    df = pd.read_csv("files/submission.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
 
-    def _featurize_number_of_calls(self, df, features):
-        features['n_calls'] = df.CSPL_RECEIVED_CALLS
+    weekdays = pd.DatetimeIndex(df['DATE']).weekday
+    days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
-    def linear_regression(self, in_filename, chunksize=10**6):
-        h5_file = tables.open_file(in_filename)
-        samples = h5_file.root.features
+    df['WEEK_END'] = (weekdays == 5 | weekdays == 6).astype(int)
 
-        clf = SGDRegressor()
-        for i in range(0, samples.nrows, chunksize):
-            X = samples[i:i+chunksize, :-1]
-            y = samples[i:i+chunksize, -1]
-            clf.partial_fit(X,y)
+    for day in range(7):
+        df[days[day]] = (weekdays == day).astype(int)
 
-        X = samples[:-1,:-1]
-        y = samples[:-1, -1]
-        y_predicted = clf.predict(X)
-        y_predicted = [int(round(x)) if x > 0 else 0 for x in y_predicted]
-        diff = (y_predicted - y)**2
-        print (sum(diff))
+    return df
 
-        h5_file.close()
 
-    # print(-scores)
+def featurize_all(df, assignments):
+    features = pd.DataFrame()
+    featurize_day_of_the_week(df, features)
+    featurize_time_slot(df, features)
+    featurize_assignment(df, features, assignments)
+    featurize_number_of_calls(df, features)
 
-feat = Featurizer()
-# feat.featurize('files/train_small.csv', 'files/featurized_small.h5')
-feat.linear_regression('files/featurized_france.h5')
+    return features
+
+
+def featurize_day_of_the_week(df, features):
+    print("Featurizing days of the week")
+
+    days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    features['is_week_end'] = df.WEEK_END
+    for day in days:
+        features[day] = (df.DAY_WE_DS == day).astype(int)
+
+    print()
+
+
+def featurize_time_slot(df, features):
+    print("Featurizing time slots")
+
+    for h in trange(24):
+        for s in range(2):
+            features['time_slot_' + str(2 * h + s)] = ((df.DATE.dt.hour == h) & (df.DATE.dt.minute == 30 * s)).astype(
+                int)
+
+    print()
+
+
+def featurize_assignment(df, features, assignments):
+    print("Featurizing assignment")
+    for assignment in assignments:
+        features[assignment] = (df.ASS_ASSIGNMENT == assignment).astype(int)
+
+    print()
+
+
+def featurize_number_of_calls(df, features):
+    print("Featurizing assignment")
+    features['n_calls'] = df.CSPL_RECEIVED_CALLS
+    print()
+
+
+def featurize_weekend(df, features):
+    print("Featurizing weekend")
+    features['n_calls'] = df.CSPL_RECEIVED_CALLS
+    print()
