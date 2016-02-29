@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # # Initialization
@@ -12,9 +11,11 @@ from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn import cross_validation
 import numpy as np
 from sklearn.metrics import mean_squared_error
+from featurizer import *
 from pandas.tseries.offsets import *
 import math
 
+<<<<<<< HEAD
 def learn_structure(filename, chunksize=10 ** 6):
     assignments = set()
 
@@ -98,15 +99,20 @@ assignments = learn_structure("../data/train_2011_2012.csv")
 featurize_assignment(df, features, assignments)
 featurize_number_of_calls(df, features)
 
+=======
+df = load_training_set("files/train_france.csv")
+assignments = learn_structure("files/train_france.csv")
+features = featurize_all(df, assignments)
+>>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 features['DATE'] = df.DATE
 
-print features.head(3)
-
+print(features.head(3))
 
 # # Submission
 
 # In[57]:
 
+<<<<<<< HEAD
 dtype = {
             'DATE': object,
             'ASS_ASSIGNMENT': str,
@@ -138,6 +144,11 @@ for day in range(7):
 featurize_time_slot(df2, submission_features)
 featurize_assignment(df2, submission_features, assignments)
 
+=======
+df2 = load_submission("files/submission.txt")
+submission_features = featurize_all(df2, assignments)
+featurize_day_of_the_week(df2, submission_features)
+>>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 
 # # Prediction
 
@@ -147,7 +158,7 @@ X_test = np.asarray(submission_features)
 clf = SGDRegressor()
 y_pred = np.zeros(len(X_test))
 
-local_df = features[features.DATE < df2.DATE[0] - DateOffset(days = 3)]
+local_df = features[features.DATE < df2.DATE[0] - DateOffset(days=3)]
 
 X_train = np.asarray(local_df)[:, :-2]
 y_train = np.asarray(local_df)[:, -2]
@@ -155,20 +166,18 @@ y_train = np.asarray(local_df)[:, -2]
 clf.partial_fit(X_train, y_train)
 y_pred[0] = clf.predict(X_test[0])
 
-for i in trange(1,len(X_test)):
-    local_df = features[(features.DATE > df2.DATE[i-1]) & (features.DATE < (df2.DATE[i] - DateOffset(days = 3)))]
+for i in trange(1, len(X_test)):
+    local_df = features[(features.DATE > df2.DATE[i - 1]) & (features.DATE < (df2.DATE[i] - DateOffset(days=3)))]
     X_train = np.asarray(local_df)[:, :-2]
     y_train = np.asarray(local_df)[:, -2]
     if X_train.shape[0] != 0:
-	    clf.partial_fit(X_train, y_train)
-    y_pred[i] = clf.predict(X_test[i])
-
+        clf.partial_fit(X_train, y_train)
+    y_pred[i] = clf.predict([X_test[i]])[0]
 
 # In[59]:
 
 y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
 #print(y_pred_round)
-
 
 # # Output
 
@@ -187,6 +196,3 @@ print(mean_squared_error(y_true, y_pred))
 
 
 # In[ ]:
-
-
-
