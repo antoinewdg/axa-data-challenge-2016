@@ -34,7 +34,7 @@ def featurize_day_of_the_week(df, features):
 	print("Featurizing days of the week")
 
 	days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-
+	features['is_week_end'] = df.WEEK_END
 	for day in days:
 	    features[day] = (df.DAY_WE_DS == day).astype(int)
 
@@ -61,6 +61,12 @@ def featurize_number_of_calls(df, features):
 	features['n_calls'] = df.CSPL_RECEIVED_CALLS
 	print ()
 
+def featurize_weekend(df, features):
+	print("Featurizing weekend")
+	features['n_calls'] = df.CSPL_RECEIVED_CALLS
+	print ()
+
+
 dtype = {
             'DATE': object,
             'WEEK_END': int,
@@ -78,6 +84,7 @@ for chunk in chunks:
     df = pd.concat([df, aux])
 
 df = df.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)['CSPL_RECEIVED_CALLS'].sum()
+
 
 
 # # Featurize database
@@ -113,8 +120,14 @@ submission_features = pd.DataFrame()
 
 weekdays = pd.DatetimeIndex(df2['DATE']).weekday
 days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+
+for day in range(5,7):
+    submission_features['WEEK_END'] = (weekdays == day).astype(int)
+    
 for day in range(7):
     submission_features[days[day]] = (weekdays == day).astype(int)
+
+
 
 featurize_time_slot(df2, submission_features)
 featurize_assignment(df2, submission_features, assignments)
@@ -129,16 +142,19 @@ clf = SGDRegressor()
 y_pred = np.zeros(len(X_test))
 
 local_df = features[features.DATE < df2.DATE[0] - DateOffset(days = 3)]
+
 X_train = np.asarray(local_df)[:, :-2]
 y_train = np.asarray(local_df)[:, -2]
+
 clf.partial_fit(X_train, y_train)
 y_pred[0] = clf.predict(X_test[0])
 
 for i in trange(1,len(X_test)):
-    local_df = features[(features.DATE > df2.DATE[i-1]) & (features.DATE < df2.DATE[i] - DateOffset(days = 3))]
+    local_df = features[(features.DATE > df2.DATE[i-1]) & (features.DATE < (df2.DATE[i] - DateOffset(days = 3)))]
     X_train = np.asarray(local_df)[:, :-2]
     y_train = np.asarray(local_df)[:, -2]
-    clf.partial_fit(X_train, y_train)
+    if X_train.shape[0] != 0:
+	    clf.partial_fit(X_train, y_train)
     y_pred[i] = clf.predict(X_test[i])
 
 

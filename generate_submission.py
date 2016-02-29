@@ -33,9 +33,9 @@ df = df.groupby(['DATE', 'ASS_ASSIGNMENT'], as_index=False, sort=True)['CSPL_REC
 
 df['prediction'] = df['CSPL_RECEIVED_CALLS']
 
-num_rows = 12409
+num_rows = 12408
 
-df.sample(n=num_rows)
+df = df.sample(n=num_rows)
 
 df.to_csv('submission_test.txt', sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
 
