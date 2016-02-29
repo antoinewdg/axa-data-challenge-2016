@@ -62,11 +62,8 @@ def load_submission(filename):
     weekdays = pd.DatetimeIndex(df['DATE']).weekday
     days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
-    df['WEEK_END'] = (weekdays == 5 | weekdays == 6).astype(int)
-
-    for day in range(7):
-        df[days[day]] = (weekdays == day).astype(int)
-
+    df['WEEK_END'] = ((weekdays == 5) | (weekdays == 6)).astype(int)
+    df['DAY_WE_DS'] = [days[w] for w in weekdays]
     return df
 
 

@@ -100,6 +100,7 @@ df = load_training_set("files/train_france.csv")
 >>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 assignments = learn_structure("files/train_france.csv")
 features = featurize_all(df, assignments)
+
 features['DATE'] = df.DATE
 
 print(features.head(3))
@@ -141,6 +142,7 @@ submission_features = featurize_all(df2, assignments)
 featurize_day_of_the_week(df2, submission_features)
 >>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 
+
 # # Prediction
 
 # In[58]:
@@ -168,14 +170,26 @@ for i in trange(1, len(X_test)):
 # In[59]:
 
 y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
-print(y_pred_round)
+#print(y_pred_round)
 
 # # Output
 
 # In[62]:
 
 df2.prediction = pd.Series(y_pred_round)
+<<<<<<< HEAD
 df2.to_csv('files/submission_out.txt', sep='\t', index=False)
+=======
+df2.to_csv('../results/submission_out.txt', sep='\t', index=False)
+
+
+print('MSE round: '),
+print(mean_squared_error(y_true, y_pred_round))
+
+
+print('MSE not round: '),
+print(mean_squared_error(y_true, y_pred))
+>>>>>>> 475fedb4f3d686be75314218949c4585ee612b42
 
 
 # In[ ]:
