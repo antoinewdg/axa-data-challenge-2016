@@ -64,6 +64,7 @@ def load_submission(filename):
 
     df['WEEK_END'] = ((weekdays == 5) | (weekdays == 6)).astype(int)
     df['DAY_WE_DS'] = [days[w] for w in weekdays]
+    df['CSPL_RECEIVED_CALLS'] = 0
     return df
 
 
