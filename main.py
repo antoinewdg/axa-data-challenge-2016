@@ -34,7 +34,7 @@ def featurize_day_of_the_week(df, features):
 	print("Featurizing days of the week")
 
 	days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-	features['is_week_end'] = df.WEEK_END
+	features['WEEK_END'] = df.WEEK_END
 	for day in days:
 	    features[day] = (df.DAY_WE_DS == day).astype(int)
 
@@ -100,7 +100,7 @@ featurize_number_of_calls(df, features)
 
 features['DATE'] = df.DATE
 
-print features.head(3)
+print(features.head(3))
 
 
 # # Submission
@@ -114,20 +114,17 @@ dtype = {
         }
 
 cols = ['DATE', 'ASS_ASSIGNMENT', 'prediction']
-df2 = pd.read_csv("files/submission.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
+df2 = pd.read_csv("files/submission_test.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
 
 submission_features = pd.DataFrame()
 
 weekdays = pd.DatetimeIndex(df2['DATE']).weekday
 days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
-for day in range(5,7):
-    submission_features['WEEK_END'] = (weekdays == day).astype(int)
+submission_features['WEEK_END'] = (weekdays == 5 | weekdays == 6).astype(int)
     
 for day in range(7):
     submission_features[days[day]] = (weekdays == day).astype(int)
-
-
 
 featurize_time_slot(df2, submission_features)
 featurize_assignment(df2, submission_features, assignments)
@@ -169,7 +166,7 @@ print(y_pred_round)
 # In[62]:
 
 df2.prediction = pd.Series(y_pred_round)
-df2.to_csv('submission_out.txt', sep='\t', index=False)
+df2.to_csv('files/submission_out.txt', sep='\t', index=False)
 
 
 # In[ ]:
