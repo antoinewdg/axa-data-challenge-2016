@@ -34,17 +34,7 @@ def load_training_set(filename):
     }
 
     cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-    chunks = pd.read_csv(filename, sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'],
-                         chunksize=10 ** 6)
-
-    df = pd.DataFrame()
-    for chunk in chunks:
-        aux = chunk.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)[
-            'CSPL_RECEIVED_CALLS'].sum()
-        df = pd.concat([df, aux])
-
-    df = df.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)[
-        'CSPL_RECEIVED_CALLS'].sum()
+    df = pd.read_csv(filename, sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'])
 
     return df
 
