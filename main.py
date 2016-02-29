@@ -15,132 +15,21 @@ from featurizer import *
 from pandas.tseries.offsets import *
 import math
 
-<<<<<<< HEAD
-def learn_structure(filename, chunksize=10 ** 6):
-    assignments = set()
-
-    dtype = {'ASS_ASSIGNMENT': str}
-    cols = ['ASS_ASSIGNMENT']
-    chunks = pd.read_csv(filename, sep=";", usecols=cols, dtype=dtype, chunksize=chunksize)
-
-    for df in tqdm(chunks):
-        assignments.update(df.ASS_ASSIGNMENT.unique())
-
-    print(assignments)
-
-    return assignments
-
-def featurize_day_of_the_week(df, features):
-
-	print("Featurizing days of the week")
-
-	days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-	features['WEEK_END'] = df.WEEK_END
-	for day in days:
-	    features[day] = (df.DAY_WE_DS == day).astype(int)
-
-	print()
-
-def featurize_time_slot(df, features):
-    print("Featurizing time slots")
-
-    for h in trange(24):
-        for s in range(2):
-            features['time_slot_' + str(2 * h + s)] = ((df.DATE.dt.hour == h) & (df.DATE.dt.minute == 30 * s)).astype(int)
-
-    print ()
-
-def featurize_assignment(df, features, assignments):
-    print("Featurizing assignment")
-    for assignment in assignments:
-        features[assignment] = (df.ASS_ASSIGNMENT == assignment).astype(int)
-
-    print ()
-
-def featurize_number_of_calls(df, features):
-	print("Featurizing assignment")
-	features['n_calls'] = df.CSPL_RECEIVED_CALLS
-	print ()
-
-def featurize_weekend(df, features):
-	print("Featurizing weekend")
-	features['n_calls'] = df.CSPL_RECEIVED_CALLS
-	print ()
-
-
-dtype = {
-            'DATE': object,
-            'WEEK_END': int,
-            'DAY_WE_DS': str,
-            'ASS_ASSIGNMENT': str,
-            'CSPL_RECEIVED_CALLS': int
-        }
-
-cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-chunks = pd.read_csv("files/train_france.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], chunksize=10**6)
-
-df = pd.DataFrame()
-for chunk in chunks:
-    aux = chunk.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)['CSPL_RECEIVED_CALLS'].sum()
-    df = pd.concat([df, aux])
-
-df = df.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)['CSPL_RECEIVED_CALLS'].sum()
-
-
-
-# # Featurize database
-
-# In[56]:
-
-features = pd.DataFrame()
-featurize_day_of_the_week(df,features)
-featurize_time_slot(df, features)
-=======
 df = load_training_set("files/train_france.csv")
->>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 assignments = learn_structure("files/train_france.csv")
 features = featurize_all(df, assignments)
 
 features['DATE'] = df.DATE
 
 print(features.head(3))
-<<<<<<< HEAD
-
-=======
->>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 
 # # Submission
 
 # In[57]:
 
-<<<<<<< HEAD
-dtype = {
-            'DATE': object,
-            'ASS_ASSIGNMENT': str,
-            'prediction': int
-        }
-
-cols = ['DATE', 'ASS_ASSIGNMENT', 'prediction']
-df2 = pd.read_csv("files/submission_test.txt", sep="\t", usecols=cols, dtype=dtype, parse_dates=['DATE'])
-
-submission_features = pd.DataFrame()
-
-weekdays = pd.DatetimeIndex(df2['DATE']).weekday
-days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-
-submission_features['WEEK_END'] = (weekdays == 5 | weekdays == 6).astype(int)
-    
-for day in range(7):
-    submission_features[days[day]] = (weekdays == day).astype(int)
-
-featurize_time_slot(df2, submission_features)
-featurize_assignment(df2, submission_features, assignments)
-
-=======
 df2 = load_submission("files/submission.txt")
 submission_features = featurize_all(df2, assignments)
 featurize_day_of_the_week(df2, submission_features)
->>>>>>> 08a45cbc5b6a55b18fbdce2aa91bb16a99c1f6d5
 
 
 # # Prediction
@@ -177,9 +66,6 @@ y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
 # In[62]:
 
 df2.prediction = pd.Series(y_pred_round)
-<<<<<<< HEAD
-df2.to_csv('files/submission_out.txt', sep='\t', index=False)
-=======
 df2.to_csv('../results/submission_out.txt', sep='\t', index=False)
 
 
@@ -189,7 +75,7 @@ print(mean_squared_error(y_true, y_pred_round))
 
 print('MSE not round: '),
 print(mean_squared_error(y_true, y_pred))
->>>>>>> 475fedb4f3d686be75314218949c4585ee612b42
 
 
 # In[ ]:
+
