@@ -36,6 +36,7 @@ df['prediction'] = df['CSPL_RECEIVED_CALLS']
 num_rows = 12408
 
 df = df.sample(n=num_rows)
+df = df.sort(['DATE'])
 
 df.to_csv('submission_test.txt', sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
 
