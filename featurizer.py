@@ -64,7 +64,6 @@ def load_submission(filename):
 
     df['WEEK_END'] = ((weekdays == 5) | (weekdays == 6)).astype(int)
     df['DAY_WE_DS'] = [days[w] for w in weekdays]
-    df['CSPL_RECEIVED_CALLS'] = 0
     return df
 
 
@@ -73,7 +72,6 @@ def featurize_all(df, assignments):
     featurize_day_of_the_week(df, features)
     featurize_time_slot(df, features)
     featurize_assignment(df, features, assignments)
-    featurize_number_of_calls(df, features)
 
     return features
 

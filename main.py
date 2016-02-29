@@ -18,6 +18,7 @@ import math
 df = load_training_set("files/train_france.csv")
 assignments = learn_structure("files/train_france.csv")
 features = featurize_all(df, assignments)
+featurize_number_of_calls(df, features)
 
 features['DATE'] = df.DATE
 
@@ -31,7 +32,8 @@ df2 = load_submission("files/submission.txt")
 submission_features = featurize_all(df2, assignments)
 featurize_day_of_the_week(df2, submission_features)
 
-
+print(features.head(3))
+print(submission_features.head(3))
 # # Prediction
 
 # In[58]:
@@ -59,7 +61,7 @@ for i in trange(1, len(X_test)):
 # In[59]:
 
 y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
-#print(y_pred_round)
+# print(y_pred_round)
 
 # # Output
 
@@ -68,14 +70,11 @@ y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
 df2.prediction = pd.Series(y_pred_round)
 df2.to_csv('../results/submission_out.txt', sep='\t', index=False)
 
-
 print('MSE round: '),
 print(mean_squared_error(y_true, y_pred_round))
-
 
 print('MSE not round: '),
 print(mean_squared_error(y_true, y_pred))
 
 
 # In[ ]:
-
