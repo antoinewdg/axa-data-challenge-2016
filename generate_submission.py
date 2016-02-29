@@ -5,39 +5,39 @@
 # In[55]:
 
 import pandas as pd
-from tqdm import tqdm, trange
-import tables
-from sklearn.linear_model import LinearRegression, SGDRegressor
-from sklearn import cross_validation
-import numpy as np
-from sklearn.metrics import mean_squared_error
-from pandas.tseries.offsets import *
-import math
+import sys
 
-dtype = {
-    'DATE': object,
-    'ASS_ASSIGNMENT': str,
-    'CSPL_RECEIVED_CALLS': int
-}
 
-cols = ['DATE', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
-chunks = pd.read_csv("files/train_france.csv", sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'],
-                     chunksize=10 ** 6)
+def generate_submission(in_filename, out_filename):
+    dtype = {
+        'DATE': object,
+        'ASS_ASSIGNMENT': str,
+        'CSPL_RECEIVED_CALLS': int
+    }
 
-df = pd.DataFrame()
-for chunk in chunks:
-    aux = chunk.groupby(['DATE', 'ASS_ASSIGNMENT'], as_index=False, sort=True)['CSPL_RECEIVED_CALLS'].sum()
-    df = pd.concat([df, aux])
+    cols = ['DATE', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
+    print("aaa" + in_filename)
+    chunks = pd.read_csv(in_filename, sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'],
+                         chunksize=10 ** 6)
 
-df = df.groupby(['DATE', 'ASS_ASSIGNMENT'], as_index=False, sort=True)['CSPL_RECEIVED_CALLS'].sum()
+    df = pd.DataFrame()
+    for chunk in chunks:
+        aux = chunk.groupby(['DATE', 'ASS_ASSIGNMENT'], as_index=False, sort=True)['CSPL_RECEIVED_CALLS'].sum()
+        df = pd.concat([df, aux])
 
-df['prediction'] = df['CSPL_RECEIVED_CALLS']
+    df = df.groupby(['DATE', 'ASS_ASSIGNMENT'], as_index=False, sort=True)['CSPL_RECEIVED_CALLS'].sum()
 
-num_rows = 12408
+    df['prediction'] = df['CSPL_RECEIVED_CALLS']
 
-df['DATE'] = pd.to_datetime(df['DATE'].astype(str))
-df = df[df['DATE'] > '2011-12-31']
-df = df.sample(n=num_rows)
-df = df.sort_values(by=['DATE'])
+    num_rows = 12408
 
-df.to_csv('files/submission_test.txt', sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
+    df['DATE'] = pd.to_datetime(df['DATE'].astype(str))
+    df = df[df['DATE'] > '2011-12-31']
+    df = df.sample(n=num_rows)
+    df = df.sort_values(by=['DATE'])
+
+    df.to_csv(out_filename, sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
+
+
+if __name__ == "__main__":
+    generate_submission(sys.argv[1], sys.argv[2])
