@@ -3,11 +3,11 @@ from tqdm import tqdm
 import sys, pickle
 
 
-def load_structure(filename="files/learned_structure.p"):
-    return pickle.load(open(filename, "rb"))
+def load_structure():
+    return pickle.load(open("files/learned_structure.p", "rb"))
 
 
-def learn_structure(in_filename, out_filename, chunksize=10 ** 6):
+def learn_structure(in_filename, chunksize=10 ** 6):
     assignments = set()
 
     dtype = {'ASS_ASSIGNMENT': str}
@@ -19,13 +19,11 @@ def learn_structure(in_filename, out_filename, chunksize=10 ** 6):
 
     structure = {"ASS_ASSIGNMENT": assignments}
 
-    pickle.dump(structure, open(out_filename, 'wb'))
+    pickle.dump(structure, open("files/learned_structure.p", 'wb'))
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        sys.argv.append("files/learned_structure.p")
-    learn_structure(sys.argv[1], sys.argv[2])
-    st = load_structure(sys.argv[2])
+    learn_structure(sys.argv[1])
+    st = load_structure()
     print("Learned structure:")
     print(st)
