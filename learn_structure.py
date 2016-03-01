@@ -17,7 +17,9 @@ def learn_structure(in_filename, out_filename, chunksize=10 ** 6):
     for df in tqdm(chunks):
         assignments.update(df.ASS_ASSIGNMENT.unique())
 
-    pickle.dump(assignments, open(out_filename, 'wb'))
+    structure = {"ASS_ASSIGNEMENT": assignments}
+
+    pickle.dump(structure, open(out_filename, 'wb'))
 
 
 if __name__ == "__main__":
