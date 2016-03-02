@@ -1,18 +1,21 @@
-n_splits = 10
-inp_file = "training.csv"
-out_file = "training_%d.csv" # %d will be 1,2,,...,n_splits
+import pandas as pd
+from tqdm import tqdm, trange
+import tables
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn import cross_validation
+import numpy as np
+from sklearn.metrics import mean_squared_error
+from featurizer import *
+from pandas.tseries.offsets import *
+import math
 
-# open files to write
-# save pointers to a list
-out_files = []
-for n in range(n_splits):
-    out_files.append(open(out_file % (n+1),"w"))
 
-with open(inp_file) as f:
-    for ind,line in enumerate(f):
-        split_id = ind % n_splits # every nth row goes to nth split
-        out_files[split_id].write(line)
-        
-# clean up - close files
-for f in out_files:
-    f.close()
+in_filename = "files/train_groupedby.csv"
+out_filename_prefix = "files/"
+df = load_training_set(in_filename)
+
+assignments = learn_structure(in_filename)
+
+for ass in assignments:
+	local_df = df[df.ASS_ASSIGNMENT == ass]
+	df.to_csv(out_filename_prefix + 'train_' + str(ass) + '.csv', sep=';', index=False)
