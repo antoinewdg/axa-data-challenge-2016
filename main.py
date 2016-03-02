@@ -13,12 +13,13 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from featurizer import *
 from pandas.tseries.offsets import *
+from learn_structure import load_structure
+from featurize_training_set import load_featurized_training_set
 import math
 
 df = load_training_set("files/train_france.csv")
-assignments = learn_structure("files/train_france.csv")
-features = featurize_all(df, assignments)
-
+assignments = load_structure()['ASS_ASSIGNMENT']
+features = load_featurized_training_set("files/train_featurized.pkl")
 features['DATE'] = df.DATE
 
 print(features.head(3))
@@ -29,14 +30,12 @@ print(features.head(3))
 
 df2 = load_submission("files/submission_test.txt")
 submission_features = featurize_all(df2, assignments)
-featurize_day_of_the_week(df2, submission_features)
 
 print(features.head(3))
 print(submission_features.head(3))
 # # Prediction
 
 # In[58]:
-
 X_test = np.asarray(submission_features)[:, :-1]
 y_true = np.asarray(submission_features)[:, -1]
 clf = SGDRegressor()
