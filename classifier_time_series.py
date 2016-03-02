@@ -12,7 +12,7 @@ import math
 training_df = load_training_set("files/train_groupedby.csv")
 training_df = training_df.set_index('DATE', drop=False)
 
-submission_df = load_submission("files/submission.txt")
+submission_df = load_submission("files/submission_test.txt")
 submission_df = submission_df.set_index('DATE', drop=False)
 
 y_true = submission_df.as_matrix()[:, -1]
@@ -23,7 +23,8 @@ for i in trange(0, submission_df.shape[0]):
 	(day, datetime, assignment) = submission_df.index[i]
 	time = datetime.time()
 
-	local_df = training_df[training_df.ASS_ASSIGNMENT == assignment]
+	local_df = training_df[training_df.index < (datetime - DateOffset(days=3))]
+	local_df = local_df[local_df.ASS_ASSIGNMENT == assignment]
 	local_df = local_df[local_df.DAY_WE_DS == day]
 	local_df = local_df[local_df.index.time == time]
 
@@ -35,7 +36,7 @@ y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
 
 submission_df.prediction = y_pred_round
 print submission_df
-submission_df[['DATE', 'ASS_ASSIGNMENT', 'prediction']].to_csv('results/submission.txt', sep='\t', index=False)
+submission_df[['DATE', 'ASS_ASSIGNMENT', 'prediction']].to_csv('results/submission_test00.txt', sep='\t', index=False)
 
 print('MSE round: '),
 print(mean_squared_error(y_true, y_pred_round))
