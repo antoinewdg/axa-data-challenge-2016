@@ -1,5 +1,10 @@
 import pandas as pd
 import sys
+from tqdm import tqdm
+
+
+def load_clean_training_set(filename):
+    return pd.read_pickle(filename)
 
 
 def clean_training_set(in_filename, out_filename):
@@ -16,7 +21,7 @@ def clean_training_set(in_filename, out_filename):
                          chunksize=10 ** 6)
 
     df = pd.DataFrame()
-    for chunk in chunks:
+    for chunk in tqdm(chunks):
         aux = chunk.groupby(['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT'], as_index=False, sort=False)[
             'CSPL_RECEIVED_CALLS'].sum()
         df = pd.concat([df, aux])
@@ -25,7 +30,8 @@ def clean_training_set(in_filename, out_filename):
         'CSPL_RECEIVED_CALLS'].sum()
     df = df.sort_values(by=['DATE'])
 
-    df.to_csv(out_filename, sep=";", index=False)
+    df.to_pickle(out_filename)
+    df.to_csv(out_filename + str('.csv'), index=False, sep=";")
 
 
 if __name__ == "__main__":

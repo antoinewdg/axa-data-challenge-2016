@@ -7,14 +7,16 @@ from featurize_training_set import load_featurized_training_set
 from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.cross_validation import KFold
+from sklearn.preprocessing import StandardScaler
 
 
-def compare_classifiers(filename):
+def compare_regressors(filename):
     clf_simple = SGDRegressor()
     clf_composite = CompositeRegressor(best_classifier(), SGDRegressor())
 
     features = load_featurized_training_set(filename)
     X = features.drop(['DATE', 'n_calls'], axis=1).as_matrix().astype(float)
+    X = StandardScaler().fit_transform(X)
     y = features.n_calls.as_matrix()
 
     mse_compsite = []
@@ -36,4 +38,4 @@ def compare_classifiers(filename):
 
 
 if __name__ == "__main__":
-    compare_classifiers("files/train_featurized.pkl")
+    compare_regressors("files/train_featurized.pkl")
