@@ -63,6 +63,7 @@ def featurize_all(df, assignments):
     featurize_day_of_the_week(df, features)
     featurize_time_slot(df, features)
     featurize_assignment(df, features, assignments)
+    featurize_night_shift(df, features)
     featurize_number_of_calls(df, features)
     return features
 
@@ -98,12 +99,13 @@ def featurize_assignment(df, features, assignments):
 
 
 def featurize_number_of_calls(df, features):
-    print("Featurizing assignment")
+    print("Featurizing number of calls")
     features['n_calls'] = df.CSPL_RECEIVED_CALLS
     print()
 
 
-def featurize_weekend(df, features):
-    print("Featurizing weekend")
-    features['n_calls'] = df.CSPL_RECEIVED_CALLS
+def featurize_night_shift(df, features):
+    print("Featurizing night shift")
+    features['night_shift'] = (df.DATE.dt.hour <= 6) | ((df.DATE.dt.hour == 7) & (df.DATE.dt.minute < 30)) | (
+        (df.DATE.dt.hour == 23) & (df.DATE.dt.minute >= 30))
     print()

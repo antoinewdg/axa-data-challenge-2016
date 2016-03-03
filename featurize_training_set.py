@@ -4,6 +4,7 @@ import sys
 
 from featurizer import *
 from learn_structure import load_structure
+from clean_training_set import load_clean_training_set
 
 
 def load_featurized_training_set(filename):
@@ -11,7 +12,7 @@ def load_featurized_training_set(filename):
 
 
 def featurize_training_set(in_filename, out_filename):
-    df = load_training_set(in_filename)
+    df = load_clean_training_set(in_filename)
     structure = load_structure()
     features = featurize_all(df, structure['ASS_ASSIGNMENT'])
     features['DATE'] = df.DATE
