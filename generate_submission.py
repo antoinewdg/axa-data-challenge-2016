@@ -32,7 +32,7 @@ def generate_submission(in_filename, out_filename):
     num_rows = 12408
 
     df['DATE'] = pd.to_datetime(df['DATE'].astype(str))
-    df = df[df['DATE'] > '2011-12-31']
+    df = df[df['DATE'] > '2012-01-01']
     df = df.sample(n=num_rows)
     df = df.sort_values(by=['DATE'])
 
