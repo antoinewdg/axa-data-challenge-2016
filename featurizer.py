@@ -61,6 +61,7 @@ def load_submission(filename):
 def featurize_all(df, assignments):
     features = pd.DataFrame()
     featurize_day_of_the_week(df, features)
+    featurize_month(df, features)
     featurize_time_slot(df, features)
     featurize_assignment(df, features, assignments)
     featurize_night_shift(df, features)
@@ -77,6 +78,13 @@ def featurize_day_of_the_week(df, features):
         features[day] = (df.DAY_WE_DS == day).astype(int)
 
     print()
+
+
+def featurize_month(df, features):
+    print("Featurizing month")
+
+    for i in range(1, 13):
+        features['month_' + str(i)] = (df.DATE.dt.month == i).astype(int)
 
 
 def featurize_time_slot(df, features):
@@ -106,6 +114,6 @@ def featurize_number_of_calls(df, features):
 
 def featurize_night_shift(df, features):
     print("Featurizing night shift")
-    features['night_shift'] = (df.DATE.dt.hour <= 6) | ((df.DATE.dt.hour == 7) & (df.DATE.dt.minute < 30)) | (
-        (df.DATE.dt.hour == 23) & (df.DATE.dt.minute >= 30))
+    features['night_shift'] = ((df.DATE.dt.hour <= 6) | ((df.DATE.dt.hour == 7) & (df.DATE.dt.minute < 30)) | (
+        (df.DATE.dt.hour == 23) & (df.DATE.dt.minute >= 30))).astype(int)
     print()
