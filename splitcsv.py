@@ -11,11 +11,11 @@ import math
 
 
 in_filename = "files/train_groupedby.csv"
-out_filename_prefix = "files/"
+out_filename_prefix = "files/assign/"
 df = load_training_set(in_filename)
 
 assignments = learn_structure(in_filename)
 
 for ass in assignments:
 	local_df = df[df.ASS_ASSIGNMENT == ass]
-	df.to_csv(out_filename_prefix + 'train_' + str(ass) + '.csv', sep=';', index=False)
+	local_df.to_csv(out_filename_prefix + 'train_' + str(ass) + '.csv', sep=';', index=False)

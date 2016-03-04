@@ -19,17 +19,22 @@ cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS'
 df = pd.read_csv('files/train_groupedby.csv', sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], index_col=['DATE'])
 
 assignment = 'CAT'
-day = 'Lundi'
-
 df = df[(df.ASS_ASSIGNMENT == assignment)]
+
+day = 'Lundi'
+# df = df[(df.DAY_WE_DS == day)
+
 time_slots = np.unique(df.index.time)
+time = time_slots[7]
+# ts = df[(df.index.time == time)]
 ax = None
+for time in time_slots[:]:
+	ts = df[(df.index.time == time)]
+	ax = ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', ax=ax, legend=False)
+	# ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', legend=False)
 
-for time in time_slots:
-    ts = df[(df.DAY_WE_DS == day) & (df.index.time == time)]
-    ax = ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', ax=ax)
-# df = df.sort_values(by=['DATE'])
-
+# df = df.sort_values()
+# ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', legend=False)
 
 # print df
 

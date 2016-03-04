@@ -36,8 +36,8 @@ print(submission_features.head(3))
 # # Prediction
 
 # In[58]:
-X_test = np.asarray(submission_features)[:, :-1]
-y_true = np.asarray(submission_features)[:, -1]
+X_test = np.asarray(submission_features)[:, :-2]
+y_true = np.asarray(submission_features)[:, -2]
 clf = SGDRegressor()
 y_pred = np.zeros(len(X_test))
 
