@@ -27,9 +27,6 @@ def load_data(df):
     sums = {}
     numbers = {}
 
-    # if os.path.isfile("files/time_series_data.pkl"):
-    #     return pickle.load(open("files/time_series_data.pkl", "rb"))
-
     update_data(df, sums, numbers)
 
     pickle.dump((sums, numbers), open("files/time_series_data.pkl", "wb"))
@@ -50,16 +47,6 @@ old_df = training_df[training_df.DATE < min_date - DateOffset(days=3)]
 
 sums, numbers = load_data(old_df)
 
-# means = np.zeros(len(days_and_assignments))
-# numbers = np.zeros(len(days_and_assignments))
-
-
-# for i in trange(len(days_and_assignments)):
-#     day, assign = days_and_assignments[i]
-#     sub = old_df[(old_df.DAY_WE_DS == day) & (old_df.ASS_ASSIGNMENT == assign)]
-#     means[i] = sub['CSPL_RECEIVED_CALLS'].mean()
-#     numbers[i] = len(sub)
-#
 prev_date = min_date
 current_date = min_date + DateOffset(days=7)
 
@@ -81,29 +68,6 @@ with tqdm(total=((max_date - min_date).days / 7) + 1) as pbar:
 
 print(n)
 y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
-# print(y_pred_round[:100])
-# print(y_true[:100])
-# print(means)
-# print(numbers)
-
-
-#
-# for i in trange(0, submission_df.shape[0]):
-# 	submission_df = submission_df.set_index(['DAY_WE_DS', 'DATE', 'ASS_ASSIGNMENT'], drop=False)
-# 	(day, datetime, assignment) = submission_df.index[i]
-# 	time = datetime.time()
-#
-# 	local_df = training_df[training_df.index < (datetime - DateOffset(days=3))]
-# 	local_df = local_df[local_df.ASS_ASSIGNMENT == assignment]
-# 	local_df = local_df[local_df.DAY_WE_DS == day]
-# 	local_df = local_df[local_df.index.time == time]
-#
-# 	y_pred[i] = local_df['CSPL_RECEIVED_CALLS'].mean()
-# 	# print y_pred[i]
-#
-# y_pred_round = [int(math.ceil(x)) if x > 0 else 0 for x in y_pred]
-# # print(y_pred_round)
-#
 submission_df.prediction = y_pred_round
 print(submission_df)
 submission_df.DATE = submission_df.DATE.apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
