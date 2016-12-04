@@ -1,11 +1,16 @@
-# coding: utf-8
-
-# # Initialization
-
-# In[55]:
-
 import pandas as pd
+from tqdm import tqdm, trange
+import tables
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.svm import SVR
+from sklearn import cross_validation
 import numpy as np
+from sklearn.metrics import mean_squared_error
+from featurizer import *
+from pandas.tseries.offsets import *
+import math
+import matplotlib.pyplot as plt
+import sys
 import matplotlib.pyplot as plt
 
 dtype = {
@@ -18,22 +23,26 @@ dtype = {
 cols = ['DATE', 'WEEK_END', 'DAY_WE_DS', 'ASS_ASSIGNMENT', 'CSPL_RECEIVED_CALLS']
 df = pd.read_csv('files/train_groupedby.csv', sep=";", usecols=cols, dtype=dtype, parse_dates=['DATE'], index_col=['DATE'])
 
+assignments = learn_structure("files/train_groupedby.csv")
 assignment = 'Japon'
-df = df[(df.ASS_ASSIGNMENT == assignment)]
+# df = df[(df.ASS_ASSIGNMENT == assignment)]
 
-day = 'Mercredi'
+day = 'Lundi'
 # df = df[(df.DAY_WE_DS == day)
 
 time_slots = np.unique(df.index.time)
 time = time_slots[20]
 # ts = df[(df.index.time == time)]
-ax = None
-for time in time_slots[16:18]:
-	ts = df[(df.DAY_WE_DS == day)]
-	ts = df[(df.index.time == time)]
-	# ts = ts['CSPL_RECEIVED_CALLS'].hist()
-	ax = ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', ax=ax, legend=False)
-	
+for assignment in assignments:
+	ax = None
+	for time in time_slots[:]:		
+		ts = df[(df.ASS_ASSIGNMENT == assignment)]
+		# ts = ts[(ts.DAY_WE_DS == day)]
+		ts = ts[(ts.index.time == time)]
+		# ts = ts['CSPL_RECEIVED_CALLS'].hist()
+		if not ts.empty:
+			ax = ts.plot(x=ts.index, y='CSPL_RECEIVED_CALLS', style='o', ax=ax, legend=False)
+	plt.show()
 
 # days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 # ax = None
@@ -58,6 +67,6 @@ for time in time_slots[16:18]:
 #     ts = df[(df.DAY_WE_DS == day)]
 #     ts = ts[['DATE', 'CSPL_RECEIVED_CALLS']]
 #     ax = ts.plot(ax=ax)
-plt.show()
+
 
 # df.to_csv(out_filename, sep='\t', index=False, columns=['DATE', 'ASS_ASSIGNMENT', 'prediction'])
