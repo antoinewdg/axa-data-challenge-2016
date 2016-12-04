@@ -1,0 +1,256 @@
+reg = lm(O3~T12+Vx, data=ozone)
+reg
+?lm
+summary(reg)
+summary
+reg = lm(O3~T12+T15+Ne12+N12+S12+E12+W12+Vx+O3v, data=ozone)
+reg
+size(load)
+load
+O3
+ozone
+size(ozone)
+lenght(ozone)
+length(ozone)
+O3 = ozone[:,2]
+O3 = ozone[1:50,2]
+O3
+O3 = ozone[1:50,1]
+O3
+O3'
+O3
+A = O3'
+a
+s
+f
+g
+3afA
+adsfkjadfks
+O3
+A
+j'J "
+O3
+Y = 03
+Y
+Y = O3
+Y
+X = ozone[1:50, 2:10]
+X
+reg
+Ye = X*reg
+reg
+reg = reg[1,1:10]
+reg = reg[1,1:9]
+length(reg)
+reg[1]
+reg[1,1]
+reg[1;1]
+reg[1,1]
+reg
+reg[1:n]
+reg[1:10]
+reg
+summary
+reg
+summary
+summary(reg)
+A = summary(reg)
+A
+theta = A[1:12,1]
+theta = A[1:10,1]
+theta = A[1:9,1]
+A[1]
+A[2]
+A
+theta = [54.7277, -0.35184, 1.49719, -4.19219, 1.27549,  3.17112, 0.52773, 2.47488, 0.60770, 0.24536]'
+theta = [54.7277, -0.35184, 1.49719, -4.19219, 1.27549,  3.17112, 0.52773, 2.47488, 0.60770, 0.24536]
+theta = (54.7277, -0.35184, 1.49719, -4.19219, 1.27549,  3.17112, 0.52773, 2.47488, 0.60770, 0.24536)
+A(1)
+theta = c(54.7277, -0.35184, 1.49719, -4.19219, 1.27549,  3.17112, 0.52773, 2.47488, 0.60770, 0.24536)
+theta
+X*theta
+X
+X*theta
+X.*theta
+c(X)
+A = c(X)
+A
+A*theta
+T12
+A(T12)
+A*theta
+A
+A($T12)
+X=c(13.4 15.0  7.9 13.1 14.1 16.7 26.8 18.4 27.2 20.6 21.0 17.4 26.9 25.5 19.4 20.8 29.5 21.7 19.7 19.0 20.7 18.0 17.4 16.3 13.6 15.8 26.0 23.5 26.3 21.8 24.8 25.2 24.6 16.8 17.1 18.0 28.9,23.4 13.0 26.0 24.9 18.4 18.7 20.4 19.6 23.2 19.8 18.9 19.7 21.1)
+X=c(13.4 15.0  7.9 13.1 14.1 16.7 26.8 18.4 27.2 20.6 21.0 17.4 26.9 25.5 19.4 20.8 29.5 21.7 19.7 19.0 20.7 18.0 17.4 16.3 13.6 15.8 26.0 23.5 26.3 21.8 24.8 25.2 24.6 16.8 17.1 18.0 28.9 23.4 13.0 26.0 24.9 18.4 18.7 20.4 19.6 23.2 19.8 18.9 19.7 21.1)
+Y
+X
+Y*X
+X*Y
+A = [1 2 3]
+A = c(1 2 3)
+A = c(1, 2, 3)
+A
+B = A'
+"
+A
+fsda
+'fdsal;kgjf
+adsf
+fda
+s
+dfsa
+B
+A
+A'
+"daf""
+"
+"dafds'
+A
+t(A)
+t(A)*A
+A %*% A
+Ye = X %*% theta
+theta
+X
+X[1, "T12"]
+X[1:50, "T12"]
+X = X[1:50, "T12", "T15, "Ne12", "N12", "S12","E12","W12","Vx","O3v"]
+A=X[1:50, "T12"]
+A
+A=[A X[1:50, "T15"]]
+A=c(A, X[1:50, "T15"])
+A
+A=X[1:50, "T12"]
+A
+B = X[1:50, "T15"]
+B
+A = c(A, t(B))
+A
+A = c(A, t(B))
+A
+X
+d <- X[1:50, "T12"]
+d
+d <- X[1:50, "T12", "T15"]
+d <- X[, "T12"]
+d
+d <- X[, "T12", "T15"]
+d <- X[, "T12" && "T15"]
+d <- data.frame(X$T12)
+d
+d %*% theta
+theta
+A = as.numeric(d)
+d <- list(d$T12)
+d
+reg
+hist(reg)
+residuals(reg)
+hist(residuals(reg))
+qqnorm(lm(03~., data=ozone)$residuals)
+qqnorm(lm(03~., data=ozone)$residuals(reg))
+qqnorm(lm()3~., data=ozone)$residuals(reg))
+qqnorm(lm()O3~., data=ozone)$residuals(reg))
+qqnorm(lm()O3~., data=ozone)$residuals)
+qqnorm(lm(O3~., data=ozone)$residuals)
+a=qqnorm(lm(O3~., data=ozone)$residuals)
+a
+hist(a)
+qqplot(a)
+plot(reg, residuals(reg))
+Ye
+reg
+A
+reg
+plot(fitted(reg), residuals(reg))
+plot(fitted(reg), abs(residuals(reg)))
+summary(reg)
+fitted
+fitted(reg)
+Ye = fitted(reg)
+csi = residuals(reg)
+csi
+abs(csi)
+plot(Ye, abs(csi))
+reg 2 = lm(abs(csi)~Ye)
+lm(abs(csi)~Ye)
+summary(reg)
+reg2 = lm(O3~Ne12+O3v, data=ozone)
+residuals(reg2)
+hist(residuals(reg2))
+qqnorm(lm(O3~Ne12+O3v, data=ozone))
+qqnorm(lm(O3~Ne12+O3v, data=ozone)$residuals)
+csi2 = residuals(reg2)
+Ye2 = fitted(reg2)
+plot(Ye2, abs(csi2))
+close
+closeall
+plot(Ye, abs(csi))
+x =3
+x
+install .aspackage("xts")
+pw
+pwd
+cwd
+getwd
+getwd()
+setwd("/Users/felipefrujeri/Desktop/axa-data-challenge-2016/)
+;
+")
+setwd("/Users/felipefrujeri/Desktop/axa-data-challenge-2016/")
+getwd()
+df <- read.csv("files/train_groupedby.csv", header=TRUE)
+df
+class(df)
+type(df)
+df$DATE
+df <- read.csv("files/train_groupedby.csv", header=TRUE, sep=';')
+df
+df$DATE
+df$ASS_ASSIGNMENT == 'CAT'
+df <- df$ASS_ASSIGNMENT == 'CAT'
+df
+df <- read.csv("files/train_groupedby.csv", header=TRUE, sep=';')
+df$DATE
+df[0]
+df['DATE']
+df[df$ASS_ASSIGNMENT == 'CAT']
+df['ASS_ASSIGNMENT'']
+df['ASS_ASSIGNMENT']
+df['ASS_ASSINGMENT']
+df['ASS_ASSIGNMENT']
+df['ASS_ASSIGNMENT' == 'CAT'']
+'
+df['ASS_ASSIGNMENT' == 'CAT']
+f <- df['ASS_ASSIGNMENT' == 'CAT']
+f
+f[0]
+f <- df['ASS_ASSIGNMENT'] if df$ASS_ASSIGNMENT
+l = df['ASS_ASSIGNMENT'] == 'CAT'
+l
+filtered <- df[l]
+filtered
+print(filtered)
+df
+df['DATE'][0]
+df[1,'DATE']
+df[2,'DATE']
+df[1000,'DATE']
+summary(df)
+df['DATE']
+summary(df)
+summary(df['DATE'])
+head(df)
+class(df$DATE)
+class(df[1,'DATE'])
+library('ts')
+dtype = {#
+        'DATE': object,#
+        'WEEK_END': int,#
+        'DAY_WE_DS': str,#
+        'ASS_ASSIGNMENT': str,#
+        'CSPL_RECEIVED_CALLS': int#
+    }
+df <- read.csv("files/train_groupedby.csv", header=TRUE, sep=';', parse_dates=['DATE'])
+df <- read.csv("files/train_groupedby.csv", header=TRUE, sep=';', parse_dates='DATE')
